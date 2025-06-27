@@ -12,6 +12,7 @@ class ViewController: UIViewController {
     var url : URL?
     var urlRequest : URLRequest?
     var urlSession : URLSession?
+    var posts : [Post] = []
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -34,6 +35,23 @@ class ViewController: UIViewController {
                 let jsonPostResponse = try! JSONSerialization.jsonObject(with: data!) as! [[String : Any]]
                 
                 print(jsonPostResponse)
+                
+                for eachPost in jsonPostResponse{
+                    let postObject = eachPost as [String : Any]
+                    
+                    let eachPostUserId = postObject["userId"] as! Int
+                    let eachPostId = postObject["id"] as! Int
+                    let eachPostTitle = postObject["title"] as! String
+                    let eachPostBody = postObject["body"] as! String
+                    
+                    let newPost = Post(userId: eachPostUserId,
+                                       id: eachPostId,
+                                       title: eachPostTitle,
+                                       body: eachPostBody)
+                    
+                    self.posts.append(newPost)
+                }
+                print(self.posts)
             }
         }
         dataTask?.resume()
