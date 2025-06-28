@@ -13,11 +13,21 @@ class ViewController: UIViewController {
     var urlRequest : URLRequest?
     var urlSession : URLSession?
     var posts : [Post] = []
+    var resueIdentifierForCell = "PostTableViewCell"
+    
+    @IBOutlet var postTableView: UITableView!
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
+        registerPostTableViewWithXIBAndInitialize()
         jsonSerialization()
+    }
+    
+    func registerPostTableViewWithXIBAndInitialize(){
+        postTableView.delegate = self
+        postTableView.dataSource = self
+        let uiNib = UINib(nibName: resueIdentifierForCell, bundle: nil)
+        self.postTableView.register(uiNib, forCellReuseIdentifier: resueIdentifierForCell)
     }
     
     func jsonSerialization(){
@@ -53,7 +63,32 @@ class ViewController: UIViewController {
                 }
                 print(self.posts)
             }
+            
+            DispatchQueue.main.async{
+                self.postTableView.reloadData()
+            }
         }
         dataTask?.resume()
+    }
+}
+
+//MARK : UITableViewDelegate Used
+extension ViewController : UITableViewDelegate {
+    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+        return 60.0
+    }
+}
+
+//MARK : UITableViewDataSource Used
+extension ViewController : UITableViewDataSource{
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        self.posts.count
+    }
+    
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        let postTableViewCell = self.postTableView.dequeueReusableCell(withIdentifier: resueIdentifierForCell, for: indexPath) as! PostTableViewCell
+        
+        postTableViewCell.userIdLabel.text = "\(self.posts[indexPath.row].id)"
+        return postTableViewCell
     }
 }
